@@ -2,6 +2,8 @@
 
 Local-first diagnostics control plane for CodexRemote. It provides a PostgreSQL-backed Admin Server and Web dashboard plus an independent Collector for Relay, Mac Agent, Simulator app-container logs, and allowlisted CoreDevice capture tasks.
 
+Version **0.0.1** is the first minimum usable snapshot. The `0.x` line remains open to rapid iteration: compatibility is decided from the actual impact of each change and recorded in [CHANGELOG.md](CHANGELOG.md), so this release does not freeze a compatibility baseline.
+
 The dashboard is the D-scheme diagnostics workbench defined in `../Codex Remote/01-架构设计/Admin Web 产品与前端架构.md`. It uses a React/TypeScript frontend embedded by the Go Admin Server, the existing PostgreSQL database, and one versioned `/api/v1` contract. The legacy DOM application and unversioned Admin APIs have been removed.
 
 ## Architecture

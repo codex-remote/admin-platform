@@ -2,7 +2,8 @@ import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { HardDriveDownload, Smartphone } from "lucide-react"
 import { api } from "../../api/client"
-import { EmptyState, ErrorState, LoadingState, StatusDot, formatTime } from "../../components/ui"
+import { formatTime } from "../../components/format"
+import { EmptyState, ErrorState, LoadingState, StatusDot } from "../../components/ui"
 
 export function CapturesPage() {
   const queryClient = useQueryClient(); const [fullLogs, setFullLogs] = useState(false)

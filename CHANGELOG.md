@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Removed the remaining pre-rebuild residue: obsolete Admin workspace configuration, unused server/store helpers, compatibility wording, placeholder global search UI, unused browser-test dependencies, duplicate font formats, and production source maps; unknown legacy `/api/*` routes now return typed JSON 404 responses instead of the SPA shell.
+- Added enforced ESLint checks and narrow-screen dashboard layouts; verified that the 390 x 844 workbench keeps overview content within the viewport while wide event records scroll only inside their table.
 - Replaced the legacy DOM dashboard with the D-scheme React/TypeScript workbench: Overview, Events, Incidents, Captures, Artifacts, and Services are backed by real data; Users and User Behavior are visible only as non-interactive `规划中` navigation items.
 - Added bounded `/api/v1` diagnostics queries with RFC 3339 time windows, multi-value filters, compound cursors, server-side facets and histograms, stable metadata envelopes, and typed error responses.
 - Moved Collector ingestion, heartbeat, capture leases, artifacts, services, devices, and live invalidation to `/api/v1`; removed all unversioned Admin routes and legacy HTML/CSS/JavaScript.
@@ -13,7 +15,7 @@
 - Added versioned Incident snapshots with transactional event evidence, artifact manifests, provenance, JSON export, and a dedicated management view.
 - Added a centralized diagnostic metadata allowlist and a migration that removes previously stored non-allowlisted fields.
 - Kept event-row DOM nodes stable across live refreshes so event selection and Incident creation are not interrupted by new log batches.
-- Fixed empty event, capture, and artifact API lists to serialize as `[]`; the dashboard now also tolerates `null` list values from older servers.
+- Fixed empty event, capture, and artifact API lists to serialize as `[]`.
 - Added PostgreSQL-backed Admin Server with versioned migrations and separated database roles.
 - Added independent Diagnostics Collector with acknowledged checkpoints, durable spool, Relay/Mac Agent JSONL ingestion, and Simulator app-container ingestion.
 - Added local operations dashboard, event streaming, diagnostics artifacts, service health, and device capture controls.

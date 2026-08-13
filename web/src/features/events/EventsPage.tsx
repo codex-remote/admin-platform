@@ -3,7 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Check, ChevronRight, Copy, FilterX, Pause, Play, Search, X } from "lucide-react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { api } from "../../api/client"
-import { EmptyState, ErrorState, Level, LoadingState, formatTime } from "../../components/ui"
+import { formatTime } from "../../components/format"
+import { EmptyState, ErrorState, Level, LoadingState } from "../../components/ui"
 import type { EventRecord, FacetValue, HistogramBucket } from "../../types"
 
 const facetLabels = { source: "来源", profile: "环境", level: "级别", category: "分类", event: "事件" } as const
@@ -35,7 +36,8 @@ export function EventsPage() {
   const setFilter = (key: FacetKey, value: string) => {
     const next = new URLSearchParams(searchParams)
     const values = new Set((next.get(key) ?? "").split(",").filter(Boolean))
-    values.has(value) ? values.delete(value) : values.add(value)
+    if (values.has(value)) values.delete(value)
+    else values.add(value)
     if (values.size) next.set(key, [...values].join(",")); else next.delete(key)
     next.delete("cursor")
     setSearchParams(next)
@@ -44,7 +46,7 @@ export function EventsPage() {
     const next = new URLSearchParams(searchParams)
     next.set("range", String(minutes)); next.delete("from"); next.delete("to"); next.delete("cursor"); setSearchParams(next)
   }
-  const search = (value: string) => { const next = new URLSearchParams(searchParams); value ? next.set("q", value) : next.delete("q"); next.delete("cursor"); setSearchParams(next, { replace: true }) }
+  const search = (value: string) => { const next = new URLSearchParams(searchParams); if (value) next.set("q", value); else next.delete("q"); next.delete("cursor"); setSearchParams(next, { replace: true }) }
 
   return <div className="events-layout">
     <aside className="facet-rail">

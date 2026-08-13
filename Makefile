@@ -10,7 +10,7 @@ web-install:
 	cd web && npm ci
 
 web-test:
-	cd web && npm run typecheck && npm test
+	cd web && npm run lint && npm run typecheck && npm test
 
 web-build:
 	cd web && npm run build

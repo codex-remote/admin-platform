@@ -18,9 +18,7 @@ import (
 )
 
 func main() {
-	defaultRoot, _ := filepath.Abs("..")
 	listen := flag.String("listen", envOr("ADMIN_LISTEN", "127.0.0.1:18880"), "HTTP listen address")
-	workspace := flag.String("workspace-root", envOr("ADMIN_WORKSPACE_ROOT", defaultRoot), "CodexRemote workspace root")
 	data := flag.String("data-dir", envOr("ADMIN_DATA_DIR", defaultDataDir()), "persistent artifact directory")
 	databaseURL := flag.String("database-url", envOr("ADMIN_DATABASE_URL", "postgres://codexremote_admin_app@127.0.0.1:5432/codexremote_admin?sslmode=disable&timezone=UTC"), "PostgreSQL connection URL")
 	token := flag.String("ingest-token", os.Getenv("ADMIN_INGEST_TOKEN"), "bearer token for event ingestion")
@@ -36,7 +34,7 @@ func main() {
 		fatal(err)
 	}
 	defer db.Close()
-	app := server.New(db, server.Config{WorkspaceRoot: *workspace, DataDir: *data, IngestToken: *token})
+	app := server.New(db, server.Config{DataDir: *data, IngestToken: *token})
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 	httpServer := &http.Server{Addr: *listen, Handler: app.Handler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 30 * time.Minute, WriteTimeout: 30 * time.Minute, IdleTimeout: 60 * time.Second}

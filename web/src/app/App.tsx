@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
-import { ChevronLeft, ChevronRight, CircleDot, Search } from "lucide-react"
+import { ChevronLeft, ChevronRight, CircleDot } from "lucide-react"
 import { NavLink, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom"
 import { navigationGroups } from "./navigation"
 import { ArtifactsPage } from "../features/artifacts/ArtifactsPage"
@@ -58,7 +58,6 @@ function Shell() {
       <header className="context-bar">
         <div><p className="eyebrow">LOCAL / POSTGRESQL</p><h1>{titles[segment] ?? "CodexRemote Admin"}</h1></div>
         <div className="context-actions">
-          <div className="global-search" aria-hidden="true"><Search size={15} /><span>筛选由当前视图控制</span></div>
           <span className={`live-status live-${live}`}><i />{live === "live" ? "实时" : live === "offline" ? "已断开" : "连接中"}</span>
         </div>
       </header>

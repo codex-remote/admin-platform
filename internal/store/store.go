@@ -464,11 +464,3 @@ func nullTimestamp(value string) any {
 	}
 	return parsed
 }
-
-func IntParam(value string, fallback int) int {
-	n, err := strconv.Atoi(value)
-	if err != nil {
-		return fallback
-	}
-	return n
-}

@@ -33,7 +33,7 @@ start_services() {
   make -C "$repo_dir" build
   stop_services
   launchctl submit -l "$admin_label" -o "$run_dir/admin-server.log" -e "$run_dir/admin-server.log" -- \
-    "$repo_dir/bin/admin-server" --workspace-root "$workspace_root" --data-dir "$run_dir/admin-data"
+    "$repo_dir/bin/admin-server" --data-dir "$run_dir/admin-data"
   launchctl submit -l "$collector_label" -o "$run_dir/collector.log" -e "$run_dir/collector.log" -- \
     "$repo_dir/bin/diagnostics-collector" --workspace-root "$workspace_root" --state-dir "$run_dir/collector-state"
   for attempt in {1..50}; do

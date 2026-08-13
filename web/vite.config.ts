@@ -6,7 +6,7 @@ export default defineConfig({
   build: {
     outDir: "../internal/server/web-dist",
     emptyOutDir: true,
-    sourcemap: true,
+    sourcemap: false,
   },
   server: {
     host: "127.0.0.1",

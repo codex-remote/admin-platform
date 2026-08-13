@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query"
 import { Download, Fingerprint } from "lucide-react"
 import { api } from "../../api/client"
-import { EmptyState, ErrorState, LoadingState, formatBytes, formatTime } from "../../components/ui"
+import { formatBytes, formatTime } from "../../components/format"
+import { EmptyState, ErrorState, LoadingState } from "../../components/ui"
 
 export function ArtifactsPage() {
   const artifacts = useQuery({ queryKey: ["artifacts"], queryFn: api.artifacts })

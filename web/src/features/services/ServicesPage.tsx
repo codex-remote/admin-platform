@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query"
 import { Activity, Clock, RadioTower } from "lucide-react"
 import { api } from "../../api/client"
-import { EmptyState, ErrorState, LoadingState, StatusDot, formatTime } from "../../components/ui"
+import { formatTime } from "../../components/format"
+import { EmptyState, ErrorState, LoadingState, StatusDot } from "../../components/ui"
 
 export function ServicesPage() {
   const services = useQuery({ queryKey: ["services"], queryFn: api.services, refetchInterval: 10_000 })

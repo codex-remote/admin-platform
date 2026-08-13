@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query"
 import { Download, FileWarning, X } from "lucide-react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { api } from "../../api/client"
-import { EmptyState, ErrorState, Level, LoadingState, formatTime } from "../../components/ui"
+import { formatTime } from "../../components/format"
+import { EmptyState, ErrorState, Level, LoadingState } from "../../components/ui"
 
 export function IncidentsPage() {
   const { incidentId } = useParams(); const navigate = useNavigate()

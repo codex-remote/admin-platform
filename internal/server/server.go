@@ -28,9 +28,8 @@ import (
 var webAssets embed.FS
 
 type Config struct {
-	WorkspaceRoot string
-	DataDir       string
-	IngestToken   string
+	DataDir     string
+	IngestToken string
 }
 
 type Server struct {
@@ -70,6 +69,12 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/v1/incidents/{id}", s.getIncident)
 	mux.HandleFunc("GET /api/v1/incidents/{id}/snapshot", s.downloadIncidentSnapshot)
 	mux.HandleFunc("GET /api/healthz", s.health)
+	apiNotFound := func(w http.ResponseWriter, _ *http.Request) {
+		writeAPIError(w, http.StatusNotFound, "not_found", "API route not found")
+	}
+	for _, method := range []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"} {
+		mux.HandleFunc(method+" /api/", apiNotFound)
+	}
 	static, _ := fs.Sub(webAssets, "web-dist")
 	fileServer := http.FileServer(http.FS(static))
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
@@ -368,7 +373,7 @@ func (s *Server) authorizeCollector(w http.ResponseWriter, r *http.Request) bool
 }
 
 func (s *Server) artifacts(w http.ResponseWriter, r *http.Request) {
-	values, err := s.store.ListArtifacts(r.Context(), store.IntParam(r.URL.Query().Get("limit"), 50))
+	values, err := s.store.ListArtifacts(r.Context(), storeLimit(r.URL.Query().Get("limit"), 50))
 	respond(w, listEnvelope[model.Artifact]{Items: nonNil(values), Meta: localQueryMeta(time.Now(), time.Time{}, time.Time{})}, err)
 }
 func (s *Server) downloadArtifact(w http.ResponseWriter, r *http.Request) {
@@ -485,16 +490,4 @@ func fingerprint(event model.Event) string {
 	data, _ := json.Marshal(event)
 	sum := sha256.Sum256(data)
 	return hex.EncodeToString(sum[:])
-}
-func fileSHA256(path string) (string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-	hash := sha256.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(hash.Sum(nil)), nil
 }

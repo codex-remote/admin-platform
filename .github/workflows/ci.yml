@@ -23,7 +23,7 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
         working-directory: web
-      - run: npm run typecheck && npm test && npm run build
+      - run: npm run lint && npm run typecheck && npm test && npm run build
         working-directory: web
       - run: go test ./cmd/... ./internal/...
       - run: go vet ./cmd/... ./internal/...

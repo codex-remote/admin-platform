@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CodexRemote Diagnostics</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div><strong>CodexRemote</strong><span>Diagnostics Console</span></div>
+    </div>
+    <nav class="tabs" aria-label="主视图">
+      <button class="tab active" data-view="events">事件</button>
+      <button class="tab" data-view="incidents">事故</button>
+      <button class="tab" data-view="captures">真机采集</button>
+      <button class="tab" data-view="artifacts">证据库</button>
+    </nav>
+    <div class="top-actions">
+      <span id="liveState" class="live-state"><i></i>实时</span>
+      <button id="refreshButton" class="icon-button" title="刷新" aria-label="刷新">↻</button>
+    </div>
+  </header>
+
+  <section id="serviceStrip" class="service-strip" aria-label="服务状态"></section>
+
+  <main>
+    <section id="eventsView" class="view active">
+      <aside class="source-rail">
+        <div class="rail-title">数据源</div>
+        <button class="source active" data-source=""><span class="source-icon all">⌘</span><span>全部事件</span><b id="countAll">0</b></button>
+        <button class="source" data-source="iphone-app"><span class="source-icon phone">▯</span><span>iPhone App</span><b id="countPhone">0</b></button>
+        <button class="source" data-source="iphone-system"><span class="source-icon system">◉</span><span>iOS System</span><b id="countSystem">0</b></button>
+        <button class="source" data-source="relay-server"><span class="source-icon relay">⇄</span><span>Relay Server</span><b id="countRelay">0</b></button>
+        <button class="source" data-source="mac-agent"><span class="source-icon agent">⌁</span><span>Mac Agent</span><b id="countAgent">0</b></button>
+        <button class="source" data-source="diagnostics-collector"><span class="source-icon collector">◆</span><span>Collector</span><b id="countCollector">0</b></button>
+
+        <div class="rail-title profiles-title">运行档位</div>
+        <label class="check-row"><input type="radio" name="profile" value="" checked><span>全部</span></label>
+        <label class="check-row"><input type="radio" name="profile" value="debug"><span>debug</span></label>
+        <label class="check-row"><input type="radio" name="profile" value="simulator"><span>simulator</span></label>
+        <label class="check-row"><input type="radio" name="profile" value="iphone"><span>iphone</span></label>
+      </aside>
+
+      <section class="event-workspace">
+        <div class="query-bar">
+          <label class="search"><span>⌕</span><input id="searchInput" placeholder="搜索事件、消息或字段" autocomplete="off"></label>
+          <select id="levelFilter" aria-label="日志级别">
+            <option value="">全部级别</option><option value="fault">Fault</option><option value="error">Error</option><option value="warning">Warning</option><option value="notice">Notice</option><option value="info">Info</option>
+          </select>
+          <button id="clearFilters" class="quiet-button">清除筛选</button>
+          <span id="resultCount" class="result-count"></span>
+        </div>
+
+        <div class="event-grid">
+          <div class="event-table-wrap">
+            <table class="event-table">
+              <thead><tr><th>时间</th><th>级别</th><th>来源</th><th>事件</th><th>关联</th></tr></thead>
+              <tbody id="eventRows"></tbody>
+            </table>
+            <div id="eventEmpty" class="empty-state hidden"><strong>没有匹配事件</strong><span>调整筛选条件，或导入一份诊断包。</span></div>
+          </div>
+          <aside id="eventDetail" class="detail-panel">
+            <div class="detail-empty"><span>↳</span><strong>选择一条事件</strong><p>查看结构化字段、会话与追踪关联。</p></div>
+          </aside>
+        </div>
+      </section>
+    </section>
+
+    <section id="incidentsView" class="view incident-view">
+      <aside class="incident-sidebar"><div class="panel-header"><h2>事故快照</h2><span id="incidentCount">0</span></div><div id="incidentList"></div></aside>
+      <section id="incidentDetail" class="incident-detail"><div class="detail-empty"><span>↳</span><strong>选择一份事故</strong><p>查看冻结的事件、附件清单和证据来源。</p></div></section>
+      <button id="newIncidentButton" class="hidden" aria-hidden="true" tabindex="-1"></button>
+    </section>
+
+    <section id="capturesView" class="view panel-view">
+      <div class="section-heading"><div><h1>真机采集</h1><p>由独立 Collector 通过 Apple CoreDevice 请求 sysdiagnose，并将证据持久化到本机。</p></div><button id="loadDevices" class="command-button">刷新设备</button></div>
+      <div class="capture-layout">
+        <section class="plain-panel"><div class="panel-header"><h2>已连接设备</h2><span id="deviceCount">0</span></div><div id="deviceList" class="device-list"></div></section>
+        <section class="plain-panel"><div class="panel-header"><h2>采集任务</h2><span id="captureCount">0</span></div><div id="captureList" class="capture-list"></div></section>
+      </div>
+    </section>
+
+    <section id="artifactsView" class="view panel-view">
+      <div class="section-heading"><div><h1>证据库</h1><p>原始诊断包保留为不可变证据，结构化事件进入统一检索时间线。</p></div><label class="upload-button">导入 iPhone 诊断包<input id="artifactUpload" type="file" accept="application/json,.json" hidden></label></div>
+      <section class="plain-panel artifacts-panel"><table class="artifact-table"><thead><tr><th>时间</th><th>来源</th><th>类型</th><th>文件</th><th>大小</th><th>校验</th><th></th></tr></thead><tbody id="artifactRows"></tbody></table><div id="uploadStatus" class="upload-status"></div></section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+  <dialog id="incidentDialog" class="incident-dialog">
+    <form id="incidentForm" method="dialog">
+      <div class="dialog-heading"><div><h2>建立事故快照</h2><p id="incidentAnchorSummary"></p></div><button id="incidentCancel" type="button" class="icon-button light" aria-label="关闭">×</button></div>
+      <input id="incidentAnchorEventID" type="hidden">
+      <label>标题<input id="incidentTitle" maxlength="160" required></label>
+      <label>严重级别<select id="incidentSeverity"><option value="info">Info</option><option value="warning">Warning</option><option value="critical">Critical</option></select></label>
+      <label>说明<textarea id="incidentSummary" maxlength="2000" rows="3"></textarea></label>
+      <div class="window-inputs"><label>事件前（秒）<input id="incidentBefore" type="number" min="1" max="3600" value="300" required></label><label>事件后（秒）<input id="incidentAfter" type="number" min="1" max="3600" value="120" required></label></div>
+      <p id="incidentFormError" class="form-error"></p>
+      <div class="dialog-actions"><button id="incidentSubmit" type="submit" class="command-button">创建快照</button></div>
+    </form>
+  </dialog>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

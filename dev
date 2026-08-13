@@ -1,0 +1,55 @@
+#!/bin/zsh
+set -euo pipefail
+
+repo_dir="${0:A:h}"
+workspace_root="${repo_dir:h}"
+run_dir="$repo_dir/.run"
+admin_label="com.codexremote.admin-platform"
+collector_label="com.codexremote.diagnostics-collector"
+admin_url="${ADMIN_URL:-http://127.0.0.1:18880}"
+
+usage() {
+  print -u2 "Usage: ./dev {start|stop|restart|status|logs}"
+}
+
+stop_services() {
+  launchctl remove "$collector_label" >/dev/null 2>&1 || true
+  launchctl remove "$admin_label" >/dev/null 2>&1 || true
+}
+
+start_services() {
+  mkdir -p "$run_dir/admin-data" "$run_dir/collector-state"
+  "$repo_dir/scripts/bootstrap-local-postgres.sh"
+  make -C "$repo_dir" build
+  stop_services
+  launchctl submit -l "$admin_label" -o "$run_dir/admin-server.log" -e "$run_dir/admin-server.log" -- \
+    "$repo_dir/bin/admin-server" --workspace-root "$workspace_root" --data-dir "$run_dir/admin-data"
+  launchctl submit -l "$collector_label" -o "$run_dir/collector.log" -e "$run_dir/collector.log" -- \
+    "$repo_dir/bin/diagnostics-collector" --workspace-root "$workspace_root" --state-dir "$run_dir/collector-state"
+  for attempt in {1..50}; do
+    if curl -fsS "$admin_url/api/healthz" >/dev/null 2>&1; then
+      print "Admin dashboard: $admin_url"
+      print "Admin log: $run_dir/admin-server.log"
+      print "Collector log: $run_dir/collector.log"
+      return
+    fi
+    sleep 0.2
+  done
+  print -u2 "Admin Server did not become healthy. See $run_dir/admin-server.log"
+  return 1
+}
+
+case "${1:-}" in
+  start) start_services ;;
+  stop) stop_services; print "Admin Platform stopped" ;;
+  restart) start_services ;;
+  status)
+    curl -fsS "$admin_url/api/healthz"
+    print
+    curl -fsS "$admin_url/api/services"
+    print ;;
+  logs)
+    print "Admin log: $run_dir/admin-server.log"
+    print "Collector log: $run_dir/collector.log" ;;
+  *) usage; exit 2 ;;
+esac

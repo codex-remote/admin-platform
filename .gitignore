@@ -1,0 +1,7 @@
+/bin/
+/.run/
+/.playwright-cli/
+/output/
+/.env.local
+*.log
+.DS_Store

@@ -15,6 +15,16 @@ usage() {
 stop_services() {
   launchctl remove "$collector_label" >/dev/null 2>&1 || true
   launchctl remove "$admin_label" >/dev/null 2>&1 || true
+  for attempt in {1..50}; do
+    if ! launchctl list "$collector_label" >/dev/null 2>&1 && \
+       ! launchctl list "$admin_label" >/dev/null 2>&1 && \
+       ! lsof -nP -iTCP:18880 -sTCP:LISTEN >/dev/null 2>&1; then
+      return
+    fi
+    sleep 0.2
+  done
+  print -u2 "Admin Platform did not stop cleanly within 10 seconds"
+  return 1
 }
 
 start_services() {
@@ -46,7 +56,7 @@ case "${1:-}" in
   status)
     curl -fsS "$admin_url/api/healthz"
     print
-    curl -fsS "$admin_url/api/services"
+    curl -fsS "$admin_url/api/v1/services"
     print ;;
   logs)
     print "Admin log: $run_dir/admin-server.log"

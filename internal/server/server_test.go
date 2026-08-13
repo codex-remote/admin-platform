@@ -1,16 +1,9 @@
 package server
 
-import (
-	"encoding/json"
-	"testing"
-)
+import "testing"
 
-func TestListResponseEncodesNilAsEmptyArray(t *testing.T) {
-	payload, err := json.Marshal(listResponse[string]("items", nil))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(payload) != `{"items":[]}` {
-		t.Fatalf("expected stable empty-list contract, got %s", payload)
+func TestNonNilEncodesNilAsEmptySlice(t *testing.T) {
+	if values := nonNil[string](nil); values == nil || len(values) != 0 {
+		t.Fatalf("expected a non-nil empty slice, got %#v", values)
 	}
 }

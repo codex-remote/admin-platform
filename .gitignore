@@ -2,6 +2,9 @@
 /.run/
 /.playwright-cli/
 /output/
+/web/node_modules/
+/web/*.tsbuildinfo
+/internal/server/web-dist/
 /.env.local
 *.log
 .DS_Store

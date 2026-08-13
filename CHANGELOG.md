@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Replaced the legacy DOM dashboard with the D-scheme React/TypeScript workbench: Overview, Events, Incidents, Captures, Artifacts, and Services are backed by real data; Users and User Behavior are visible only as non-interactive `规划中` navigation items.
+- Added bounded `/api/v1` diagnostics queries with RFC 3339 time windows, multi-value filters, compound cursors, server-side facets and histograms, stable metadata envelopes, and typed error responses.
+- Moved Collector ingestion, heartbeat, capture leases, artifacts, services, devices, and live invalidation to `/api/v1`; removed all unversioned Admin routes and legacy HTML/CSS/JavaScript.
+- Added the React/Vite build to the Go embed and CI pipeline, local IBM Plex assets, strict TypeScript, capability tests, API query/cursor tests, and a single `make test`/`make build` workflow.
+- Fixed a launchd restart race by waiting for prior Admin/Collector labels and port `18880` to be fully released before submitting replacement processes.
 - Added a documented Admin capability lifecycle: available modules are operable, Users and User Behavior are visible as non-interactive `规划中`, and uncertain candidates remain hidden from the product but discoverable with explicit activation criteria.
 - Accepted the D-scheme Admin Web architecture and hard-cut development plan: Linear-like shell, Datadog-style event exploration, Sentry-style incidents, versioned APIs, existing PostgreSQL reuse, and mandatory removal of the legacy Web/API implementation after E2E.
 - Validated the 2026-08-13 local Simulator ingestion loop: the native app connected to the simulator Relay, Collector acknowledged the new app-container and Relay JSONL offsets with an empty spool, PostgreSQL retained the events across an Admin/Collector restart, and the dashboard event/detail/Incident views passed headed-browser checks with no console errors.

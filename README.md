@@ -2,7 +2,7 @@
 
 Local-first diagnostics control plane for CodexRemote. It provides a PostgreSQL-backed Admin Server and Web dashboard plus an independent Collector for Relay, Mac Agent, Simulator app-container logs, and allowlisted CoreDevice capture tasks.
 
-The current dashboard is the validated diagnostics baseline. Its accepted replacement is the D-scheme workbench defined in `../Codex Remote/01-架构设计/Admin Web 产品与前端架构.md`, with capability visibility governed by `../Codex Remote/01-架构设计/Admin 能力目录与导航策略.md` and implementation/deletion gates in `../Codex Remote/04-开发计划/Admin Web 重构开发计划.md`. The replacement keeps this PostgreSQL database and performs a hard cut without a legacy Web or API compatibility layer.
+The dashboard is the D-scheme diagnostics workbench defined in `../Codex Remote/01-架构设计/Admin Web 产品与前端架构.md`. It uses a React/TypeScript frontend embedded by the Go Admin Server, the existing PostgreSQL database, and one versioned `/api/v1` contract. The legacy DOM application and unversioned Admin APIs have been removed.
 
 ## Architecture
 
@@ -15,7 +15,7 @@ Collector never connects to PostgreSQL. It persists a batch before upload and ad
 
 ## Local Development
 
-Prerequisites: Go 1.24+, PostgreSQL 14+, Xcode command-line tools, and `rg`. The bootstrap defaults to the local `root` PostgreSQL role only for role/database creation; Admin runtime uses `codexremote_admin_app`, which is not a superuser.
+Prerequisites: Go 1.24+, Node.js 22+, PostgreSQL 14+, Xcode command-line tools, and `rg`. The bootstrap defaults to the local `root` PostgreSQL role only for role/database creation; Admin runtime uses `codexremote_admin_app`, which is not a superuser.
 
 ```bash
 ./dev start
@@ -38,11 +38,12 @@ Relay and Mac Agent JSONL files are discovered from sibling `.run/{debug,simulat
 ## Verification
 
 ```bash
-go test ./...
-go vet ./...
+make test
+make vet
 make build
 curl -fsS http://127.0.0.1:18880/api/healthz
-curl -fsS http://127.0.0.1:18880/api/overview
+curl -fsS http://127.0.0.1:18880/api/v1/overview
+curl -fsS 'http://127.0.0.1:18880/api/v1/diagnostics/events?limit=10'
 ```
 
 The JSON API is the machine/AI-readable interface. The dashboard is the human-readable interface; both query the same normalized records and correlation IDs.

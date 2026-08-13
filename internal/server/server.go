@@ -24,7 +24,7 @@ import (
 	"github.com/ai-coding-remote/admin-platform/internal/store"
 )
 
-//go:embed web/*
+//go:embed web-dist
 var webAssets embed.FS
 
 type Config struct {
@@ -47,27 +47,30 @@ func New(db *store.Store, config Config) *Server {
 
 func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /api/overview", s.overview)
-	mux.HandleFunc("GET /api/events", s.events)
-	mux.HandleFunc("POST /api/events", s.ingestEvents)
-	mux.HandleFunc("POST /api/collector/heartbeat", s.collectorHeartbeat)
-	mux.HandleFunc("GET /api/collector/captures/next", s.claimCapture)
-	mux.HandleFunc("POST /api/collector/captures/{id}/renew", s.renewCapture)
-	mux.HandleFunc("PATCH /api/collector/captures/{id}", s.completeCapture)
-	mux.HandleFunc("GET /api/stream", s.stream)
-	mux.HandleFunc("GET /api/services", s.services)
-	mux.HandleFunc("GET /api/devices", s.devices)
-	mux.HandleFunc("POST /api/captures", s.createCapture)
-	mux.HandleFunc("GET /api/captures", s.captures)
-	mux.HandleFunc("POST /api/artifacts", s.uploadArtifact)
-	mux.HandleFunc("GET /api/artifacts", s.artifacts)
-	mux.HandleFunc("GET /api/artifacts/{id}", s.downloadArtifact)
+	mux.HandleFunc("GET /api/v1/overview", s.apiV1Overview)
+	mux.HandleFunc("GET /api/v1/diagnostics/events", s.apiV1Events)
+	mux.HandleFunc("GET /api/v1/diagnostics/events/{id}", s.apiV1Event)
+	mux.HandleFunc("GET /api/v1/diagnostics/facets", s.apiV1Facets)
+	mux.HandleFunc("GET /api/v1/diagnostics/histogram", s.apiV1Histogram)
+	mux.HandleFunc("POST /api/v1/ingest/events", s.ingestEvents)
+	mux.HandleFunc("POST /api/v1/collector/heartbeat", s.collectorHeartbeat)
+	mux.HandleFunc("GET /api/v1/collector/captures/next", s.claimCapture)
+	mux.HandleFunc("POST /api/v1/collector/captures/{id}/renew", s.renewCapture)
+	mux.HandleFunc("PATCH /api/v1/collector/captures/{id}", s.completeCapture)
+	mux.HandleFunc("GET /api/v1/stream", s.stream)
+	mux.HandleFunc("GET /api/v1/services", s.services)
+	mux.HandleFunc("GET /api/v1/devices", s.devices)
+	mux.HandleFunc("POST /api/v1/captures", s.createCapture)
+	mux.HandleFunc("GET /api/v1/captures", s.captures)
+	mux.HandleFunc("POST /api/v1/artifacts", s.uploadArtifact)
+	mux.HandleFunc("GET /api/v1/artifacts", s.artifacts)
+	mux.HandleFunc("GET /api/v1/artifacts/{id}", s.downloadArtifact)
 	mux.HandleFunc("GET /api/v1/incidents", s.listIncidents)
 	mux.HandleFunc("POST /api/v1/incidents", s.createIncident)
 	mux.HandleFunc("GET /api/v1/incidents/{id}", s.getIncident)
 	mux.HandleFunc("GET /api/v1/incidents/{id}/snapshot", s.downloadIncidentSnapshot)
 	mux.HandleFunc("GET /api/healthz", s.health)
-	static, _ := fs.Sub(webAssets, "web")
+	static, _ := fs.Sub(webAssets, "web-dist")
 	fileServer := http.FileServer(http.FS(static))
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
@@ -95,21 +98,9 @@ func (s *Server) health(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true, "database": "postgresql", "database_user": user, "database_timezone": timezone})
 }
 
-func (s *Server) overview(w http.ResponseWriter, r *http.Request) {
-	value, err := s.store.Overview(r.Context())
-	respond(w, value, err)
-}
-
-func (s *Server) events(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	events, err := s.store.QueryEvents(r.Context(), model.EventQuery{
-		Source: q.Get("source"), Profile: q.Get("profile"), Level: q.Get("level"), Category: q.Get("category"), Search: q.Get("q"), SessionID: q.Get("session_id"), TraceID: q.Get("trace_id"), TurnRef: q.Get("turn_ref"), BeforeID: int64(store.IntParam(q.Get("before_id"), 0)), Limit: store.IntParam(q.Get("limit"), 200)})
-	respond(w, listResponse("events", events), err)
-}
-
 func (s *Server) ingestEvents(w http.ResponseWriter, r *http.Request) {
 	if s.config.IngestToken != "" && r.Header.Get("Authorization") != "Bearer "+s.config.IngestToken {
-		writeError(w, http.StatusUnauthorized, "invalid ingest token")
+		writeAPIError(w, http.StatusUnauthorized, "unauthorized", "invalid ingest token")
 		return
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, 4*1024*1024)
@@ -117,16 +108,16 @@ func (s *Server) ingestEvents(w http.ResponseWriter, r *http.Request) {
 		Events []model.Event `json:"events"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeAPIError(w, http.StatusBadRequest, "invalid_body", err.Error())
 		return
 	}
 	if len(payload.Events) > 1000 {
-		writeError(w, http.StatusBadRequest, "maximum 1000 events per request")
+		writeAPIError(w, http.StatusBadRequest, "batch_too_large", "maximum 1000 events per request")
 		return
 	}
 	for i := range payload.Events {
 		if payload.Events[i].Source == "" {
-			writeError(w, http.StatusBadRequest, "source is required")
+			writeAPIError(w, http.StatusBadRequest, "invalid_event", "source is required")
 			return
 		}
 		if payload.Events[i].Fingerprint == "" {
@@ -193,12 +184,12 @@ func (s *Server) services(w http.ResponseWriter, r *http.Request) {
 		out = append(out, service{Name: "Collector", Source: "diagnostics-collector", Profile: collector.ID,
 			Status: collector.Status, URL: "local", Detail: map[string]any{"pending_batches": collector.PendingBatches, "hostname": collector.Hostname, "updated_at": collector.UpdatedAt}})
 	}
-	respond(w, listResponse("services", out), nil)
+	respond(w, listEnvelope[service]{Items: nonNil(out), Meta: localQueryMeta(time.Now(), time.Time{}, time.Time{})}, nil)
 }
 
 func (s *Server) devices(w http.ResponseWriter, r *http.Request) {
 	values, err := s.store.DeviceInventory(r.Context())
-	respond(w, listResponse("devices", values), err)
+	respond(w, listEnvelope[model.Device]{Items: nonNil(values), Meta: localQueryMeta(time.Now(), time.Time{}, time.Time{})}, err)
 }
 
 func (s *Server) createCapture(w http.ResponseWriter, r *http.Request) {
@@ -306,7 +297,7 @@ func (s *Server) completeCapture(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) captures(w http.ResponseWriter, r *http.Request) {
 	values, err := s.store.ListCaptures(r.Context())
-	respond(w, listResponse("captures", values), err)
+	respond(w, listEnvelope[model.Capture]{Items: nonNil(values), Meta: localQueryMeta(time.Now(), time.Time{}, time.Time{})}, err)
 }
 
 func (s *Server) uploadArtifact(w http.ResponseWriter, r *http.Request) {
@@ -378,7 +369,7 @@ func (s *Server) authorizeCollector(w http.ResponseWriter, r *http.Request) bool
 
 func (s *Server) artifacts(w http.ResponseWriter, r *http.Request) {
 	values, err := s.store.ListArtifacts(r.Context(), store.IntParam(r.URL.Query().Get("limit"), 50))
-	respond(w, listResponse("artifacts", values), err)
+	respond(w, listEnvelope[model.Artifact]{Items: nonNil(values), Meta: localQueryMeta(time.Now(), time.Time{}, time.Time{})}, err)
 }
 func (s *Server) downloadArtifact(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
@@ -467,19 +458,28 @@ func respond(w http.ResponseWriter, value any, err error) {
 	}
 	writeJSON(w, http.StatusOK, value)
 }
-func listResponse[T any](key string, values []T) map[string]any {
-	if values == nil {
-		values = []T{}
-	}
-	return map[string]any{key: values}
-}
 func writeJSON(w http.ResponseWriter, status int, value any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(value)
 }
 func writeError(w http.ResponseWriter, status int, message string) {
-	writeJSON(w, status, map[string]any{"error": message})
+	code := "request_failed"
+	switch status {
+	case http.StatusBadRequest:
+		code = "invalid_request"
+	case http.StatusUnauthorized:
+		code = "unauthorized"
+	case http.StatusNotFound:
+		code = "not_found"
+	case http.StatusConflict:
+		code = "conflict"
+	case http.StatusRequestEntityTooLarge:
+		code = "payload_too_large"
+	case http.StatusInternalServerError, http.StatusServiceUnavailable:
+		code = "internal_error"
+	}
+	writeAPIError(w, status, code, message)
 }
 func fingerprint(event model.Event) string {
 	data, _ := json.Marshal(event)

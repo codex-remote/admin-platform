@@ -162,7 +162,7 @@ func (c *Collector) heartbeat(ctx context.Context, pending int) {
 	}
 	details, _ := json.Marshal(detailsPayload)
 	payload, _ := json.Marshal(map[string]any{"id": c.config.CollectorID, "hostname": hostname, "pending_batches": pending, "details": json.RawMessage(details)})
-	request, err := c.request(ctx, http.MethodPost, "/api/collector/heartbeat", bytes.NewReader(payload))
+	request, err := c.request(ctx, http.MethodPost, "/api/v1/collector/heartbeat", bytes.NewReader(payload))
 	if err != nil {
 		return
 	}
@@ -180,7 +180,7 @@ func (c *Collector) startCapture(ctx context.Context) {
 		return
 	}
 	c.captureMu.Unlock()
-	request, err := c.request(ctx, http.MethodGet, "/api/collector/captures/next?collector_id="+url.QueryEscape(c.config.CollectorID), nil)
+	request, err := c.request(ctx, http.MethodGet, "/api/v1/collector/captures/next?collector_id="+url.QueryEscape(c.config.CollectorID), nil)
 	if err != nil {
 		return
 	}
@@ -251,7 +251,7 @@ func (c *Collector) renewCaptureLease(ctx context.Context, id int64, done <-chan
 		case <-done:
 			return
 		case <-ticker.C:
-			path := fmt.Sprintf("/api/collector/captures/%d/renew?collector_id=%s", id, url.QueryEscape(c.config.CollectorID))
+			path := fmt.Sprintf("/api/v1/collector/captures/%d/renew?collector_id=%s", id, url.QueryEscape(c.config.CollectorID))
 			request, err := c.request(ctx, http.MethodPost, path, nil)
 			if err != nil {
 				continue
@@ -288,7 +288,7 @@ func (c *Collector) uploadArtifact(ctx context.Context, path, kind, source strin
 		}
 		_ = pipeWriter.CloseWithError(createErr)
 	}()
-	request, err := c.request(ctx, http.MethodPost, "/api/artifacts", pipeReader)
+	request, err := c.request(ctx, http.MethodPost, "/api/v1/artifacts", pipeReader)
 	if err != nil {
 		return 0, err
 	}
@@ -313,7 +313,7 @@ func (c *Collector) uploadArtifact(ctx context.Context, path, kind, source strin
 
 func (c *Collector) reportCapture(ctx context.Context, id int64, status, message string, artifactID *int64) {
 	payload, _ := json.Marshal(map[string]any{"status": status, "error": message, "artifact_id": artifactID})
-	request, err := c.request(ctx, http.MethodPatch, fmt.Sprintf("/api/collector/captures/%d", id), bytes.NewReader(payload))
+	request, err := c.request(ctx, http.MethodPatch, fmt.Sprintf("/api/v1/collector/captures/%d", id), bytes.NewReader(payload))
 	if err != nil {
 		return
 	}
@@ -499,7 +499,7 @@ func (c *Collector) flush(ctx context.Context, path string) error {
 	if err != nil {
 		return err
 	}
-	request, err := c.request(ctx, http.MethodPost, "/api/events", bytes.NewReader(payload))
+	request, err := c.request(ctx, http.MethodPost, "/api/v1/ingest/events", bytes.NewReader(payload))
 	if err != nil {
 		return err
 	}

@@ -46,16 +46,40 @@ func (e *Event) Normalize() {
 }
 
 type EventQuery struct {
-	Source    string
-	Profile   string
-	Level     string
-	Category  string
-	Search    string
-	SessionID string
-	TraceID   string
-	TurnRef   string
-	BeforeID  int64
-	Limit     int
+	Sources    []string
+	Profiles   []string
+	Levels     []string
+	Categories []string
+	Names      []string
+	Search     string
+	SessionID  string
+	TraceID    string
+	TurnRef    string
+	From       time.Time
+	To         time.Time
+	CursorAt   time.Time
+	CursorID   int64
+	Limit      int
+}
+
+type FacetValue struct {
+	Value string `json:"value"`
+	Count int64  `json:"count"`
+}
+
+type EventFacets struct {
+	Sources    []FacetValue `json:"source"`
+	Profiles   []FacetValue `json:"profile"`
+	Levels     []FacetValue `json:"level"`
+	Categories []FacetValue `json:"category"`
+	Names      []FacetValue `json:"event"`
+}
+
+type HistogramBucket struct {
+	Start    string `json:"start"`
+	Count    int64  `json:"count"`
+	Errors   int64  `json:"errors"`
+	Warnings int64  `json:"warnings"`
 }
 
 type Artifact struct {

@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/ai-coding-remote/admin-platform/internal/incident"
 )
@@ -20,7 +21,7 @@ type incidentService interface {
 
 func (s *Server) listIncidents(w http.ResponseWriter, r *http.Request) {
 	items, err := s.incidents.List(r.Context(), storeLimit(r.URL.Query().Get("limit"), 50))
-	respond(w, listResponse("incidents", items), err)
+	respond(w, listEnvelope[incident.Summary]{Items: nonNil(items), Meta: localQueryMeta(time.Now(), time.Time{}, time.Time{})}, err)
 }
 
 func (s *Server) createIncident(w http.ResponseWriter, r *http.Request) {

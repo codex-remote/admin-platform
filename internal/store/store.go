@@ -181,54 +181,6 @@ session_id,trace_id,turn_ref,sequence,fields_json,artifact_id FROM events WHERE 
 	return event, err
 }
 
-func (s *Store) QueryEvents(ctx context.Context, q model.EventQuery) ([]model.Event, error) {
-	if q.Limit <= 0 || q.Limit > 500 {
-		q.Limit = 200
-	}
-	clauses := []string{"TRUE"}
-	args := []any{}
-	add := func(column, value string) {
-		if value != "" {
-			args = append(args, value)
-			clauses = append(clauses, fmt.Sprintf("%s = $%d", column, len(args)))
-		}
-	}
-	add("source", q.Source)
-	add("profile", q.Profile)
-	add("level", strings.ToLower(q.Level))
-	add("category", q.Category)
-	add("session_id", q.SessionID)
-	add("trace_id", q.TraceID)
-	add("turn_ref", q.TurnRef)
-	if q.BeforeID > 0 {
-		args = append(args, q.BeforeID)
-		clauses = append(clauses, fmt.Sprintf("id < $%d", len(args)))
-	}
-	if q.Search != "" {
-		args = append(args, "%"+q.Search+"%")
-		placeholder := fmt.Sprintf("$%d", len(args))
-		clauses = append(clauses, "(event ILIKE "+placeholder+" OR message ILIKE "+placeholder+" OR fields_json::text ILIKE "+placeholder+")")
-	}
-	args = append(args, q.Limit)
-	query := `SELECT id,timestamp,received_at,source,profile,level,category,event,message,
-session_id,trace_id,turn_ref,sequence,fields_json,artifact_id FROM events WHERE ` + strings.Join(clauses, " AND ") +
-		fmt.Sprintf(` ORDER BY timestamp DESC,id DESC LIMIT $%d`, len(args))
-	rows, err := s.db.QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var out []model.Event
-	for rows.Next() {
-		e, err := scanEvent(rows)
-		if err != nil {
-			return nil, err
-		}
-		out = append(out, e)
-	}
-	return out, rows.Err()
-}
-
 func scanEvent(row rowScanner) (model.Event, error) {
 	var event model.Event
 	var timestamp, receivedAt time.Time

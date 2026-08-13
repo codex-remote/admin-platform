@@ -47,7 +47,7 @@ func TestCollectorRetriesSpoolBeforeAdvancingCheckpoint(t *testing.T) {
 	status := http.StatusServiceUnavailable
 	requests := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/api/events" {
+		if r.URL.Path != "/api/v1/ingest/events" {
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte(`{"capture":null}`))
 			return
@@ -112,7 +112,7 @@ func TestCollectorRetriesSpoolBeforeAdvancingCheckpoint(t *testing.T) {
 func TestCollectorLeavesPartialLineUnread(t *testing.T) {
 	var batches []int
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/api/events" {
+		if r.URL.Path != "/api/v1/ingest/events" {
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte(`{"capture":null}`))
 			return

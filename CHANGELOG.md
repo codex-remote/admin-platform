@@ -5,6 +5,7 @@
 `0.x` releases remain open to rapid iteration. Compatibility will be decided from the actual impact of each change and recorded here; `0.0.1` does not freeze a compatibility baseline.
 
 - Adopted Apache License 2.0, public contribution guidance, multi-ecosystem Dependabot updates, and the canonical `github.com/codex-remote/admin-platform` module path.
+- Upgraded Vitest to 4.1.11 and js-yaml to a patched release before public source publication.
 
 ## 0.0.1 - 2026-08-13
 

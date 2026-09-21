@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
-import { ChevronLeft, ChevronRight, CircleDot } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { NavLink, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom"
 import { navigationGroups } from "./navigation"
 import { ArtifactsPage } from "../features/artifacts/ArtifactsPage"
@@ -35,7 +35,7 @@ function Shell() {
 
   return <div className={`app-shell ${collapsed ? "is-collapsed" : ""}`}>
     <aside className="sidebar">
-      <div className="brand-mark"><span className="brand-signal"><CircleDot size={18} /></span><div className="brand-copy"><strong>CodexRemote</strong><small>Admin</small></div></div>
+      <div className="brand-mark"><span className="brand-signal" aria-hidden="true"><img src="/brand-mark.png" alt="" /></span><div className="brand-copy"><strong>CodexRemote</strong><small>Admin</small></div></div>
       <nav aria-label="主导航">
         {navigationGroups.map(group => <div className="nav-group" key={group.label}>
           <div className="nav-group-label">{group.label}</div>

@@ -20,7 +20,7 @@ Collector never connects to PostgreSQL. It persists a batch before upload and ad
 
 ## Local Development
 
-Prerequisites: Go 1.24+, Node.js 22+, PostgreSQL 14+, Xcode command-line tools, and `rg`. The bootstrap defaults to the local `root` PostgreSQL role only for role/database creation; Admin runtime uses `codexremote_admin_app`, which is not a superuser.
+Prerequisites: Go 1.25+, Node.js 22+, PostgreSQL 14+, Xcode command-line tools, and `rg`. The bootstrap defaults to the local `root` PostgreSQL role only for role/database creation; Admin runtime uses `codexremote_admin_app`, which is not a superuser.
 
 ```bash
 ./dev start

@@ -6,6 +6,7 @@
 
 - Adopted Apache License 2.0, public contribution guidance, multi-ecosystem Dependabot updates, and the canonical `github.com/codex-remote/admin-platform` module path.
 - Upgraded Vitest to 4.1.11 and js-yaml to a patched release before public source publication.
+- Raised the Go baseline to 1.25 and upgraded `pgx/v5` and `x/crypto` to patched releases before public source publication.
 
 ## 0.0.1 - 2026-08-13
 

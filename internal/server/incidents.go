@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ai-coding-remote/admin-platform/internal/incident"
+	"github.com/codex-remote/admin-platform/internal/incident"
 )
 
 type incidentService interface {

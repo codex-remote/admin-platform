@@ -1,4 +1,4 @@
-module github.com/ai-coding-remote/admin-platform
+module github.com/codex-remote/admin-platform
 
 go 1.24.0
 

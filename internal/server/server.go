@@ -18,10 +18,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ai-coding-remote/admin-platform/internal/incident"
-	"github.com/ai-coding-remote/admin-platform/internal/ingest"
-	"github.com/ai-coding-remote/admin-platform/internal/model"
-	"github.com/ai-coding-remote/admin-platform/internal/store"
+	"github.com/codex-remote/admin-platform/internal/incident"
+	"github.com/codex-remote/admin-platform/internal/ingest"
+	"github.com/codex-remote/admin-platform/internal/model"
+	"github.com/codex-remote/admin-platform/internal/store"
 )
 
 //go:embed web-dist

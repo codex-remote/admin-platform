@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ai-coding-remote/admin-platform/internal/collector"
+	"github.com/codex-remote/admin-platform/internal/collector"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 	stateDir := flag.String("state-dir", envOr("COLLECTOR_STATE_DIR", defaultStateDir()), "checkpoint and spool directory")
 	token := flag.String("ingest-token", os.Getenv("ADMIN_INGEST_TOKEN"), "Admin ingest bearer token")
 	simulator := flag.String("simulator", envOr("COLLECTOR_SIMULATOR", "booted"), "Simulator UDID or booted")
-	bundleID := flag.String("iphone-bundle-id", envOr("IPHONE_BUNDLE_ID", "com.leehooo.codexremote.dev925r8v9794"), "iPhone app bundle identifier")
+	bundleID := flag.String("iphone-bundle-id", envOr("IPHONE_BUNDLE_ID", "org.codexremote.app"), "iPhone app bundle identifier")
 	collectorID := flag.String("collector-id", envOr("COLLECTOR_ID", "local-mac"), "stable collector identifier")
 	interval := flag.Duration("interval", 2*time.Second, "collection interval")
 	once := flag.Bool("once", false, "run one collection cycle")

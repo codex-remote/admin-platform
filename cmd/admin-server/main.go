@@ -13,8 +13,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ai-coding-remote/admin-platform/internal/server"
-	"github.com/ai-coding-remote/admin-platform/internal/store"
+	"github.com/codex-remote/admin-platform/internal/server"
+	"github.com/codex-remote/admin-platform/internal/store"
 )
 
 func main() {

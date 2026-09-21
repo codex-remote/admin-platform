@@ -4,6 +4,8 @@
 
 `0.x` releases remain open to rapid iteration. Compatibility will be decided from the actual impact of each change and recorded here; `0.0.1` does not freeze a compatibility baseline.
 
+- Adopted Apache License 2.0, public contribution guidance, multi-ecosystem Dependabot updates, and the canonical `github.com/codex-remote/admin-platform` module path.
+
 ## 0.0.1 - 2026-08-13
 
 - Removed the remaining pre-rebuild residue: obsolete Admin workspace configuration, unused server/store helpers, compatibility wording, placeholder global search UI, unused browser-test dependencies, duplicate font formats, and production source maps; unknown legacy `/api/*` routes now return typed JSON 404 responses instead of the SPA shell.

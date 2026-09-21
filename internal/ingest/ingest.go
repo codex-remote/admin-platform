@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ai-coding-remote/admin-platform/internal/model"
-	"github.com/ai-coding-remote/admin-platform/internal/store"
+	"github.com/codex-remote/admin-platform/internal/model"
+	"github.com/codex-remote/admin-platform/internal/store"
 )
 
 type Parser struct{ Store *store.Store }

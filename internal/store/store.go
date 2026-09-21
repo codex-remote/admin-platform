@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ai-coding-remote/admin-platform/internal/incident"
-	"github.com/ai-coding-remote/admin-platform/internal/model"
-	"github.com/ai-coding-remote/admin-platform/internal/privacy"
+	"github.com/codex-remote/admin-platform/internal/incident"
+	"github.com/codex-remote/admin-platform/internal/model"
+	"github.com/codex-remote/admin-platform/internal/privacy"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 

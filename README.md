@@ -1,4 +1,7 @@
-# CodexRemote Admin Platform
+# Codex Remote Admin Platform
+
+> Codex Remote is an independent open-source project and is not affiliated
+> with or endorsed by OpenAI.
 
 Local-first diagnostics control plane for CodexRemote. It provides a PostgreSQL-backed Admin Server and Web dashboard plus an independent Collector for Relay, Mac Agent, Simulator app-container logs, and allowlisted CoreDevice capture tasks.
 
@@ -60,3 +63,10 @@ Select an event and use **建立事故** to freeze a bounded evidence window. Th
 - Migrations are append-only numbered SQL files. Apply them with `make migrate` before deploying a new binary.
 - Do not log prompts, responses, credentials, relay URLs, or complete user file paths.
 - Event fields pass through a central metadata allowlist before PostgreSQL storage. Additions require a privacy review and tests in `internal/privacy`.
+
+## Open source
+
+This repository is licensed under the [Apache License 2.0](LICENSE). Read the
+organization [contribution guide](https://github.com/codex-remote/.github/blob/main/CONTRIBUTING.md)
+before proposing changes. See [NOTICE](NOTICE) for attribution and project-name
+guidance.

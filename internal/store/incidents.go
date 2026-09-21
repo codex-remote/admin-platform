@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ai-coding-remote/admin-platform/internal/incident"
-	"github.com/ai-coding-remote/admin-platform/internal/model"
+	"github.com/codex-remote/admin-platform/internal/incident"
+	"github.com/codex-remote/admin-platform/internal/model"
 )
 
 const privacyPolicy = "allowlisted metadata only; prompts, responses, credentials, relay URLs, and full file paths are prohibited"

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ai-coding-remote/admin-platform/internal/model"
+	"github.com/codex-remote/admin-platform/internal/model"
 )
 
 type fakeRepository struct {

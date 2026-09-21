@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/ai-coding-remote/admin-platform/internal/model"
+	"github.com/codex-remote/admin-platform/internal/model"
 )
 
 var validDeviceID = regexp.MustCompile(`^[A-Za-z0-9-]{8,64}$`)

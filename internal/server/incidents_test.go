@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ai-coding-remote/admin-platform/internal/incident"
+	"github.com/codex-remote/admin-platform/internal/incident"
 )
 
 type fakeIncidentService struct {

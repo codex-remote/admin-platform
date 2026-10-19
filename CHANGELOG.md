@@ -7,6 +7,7 @@
 - Adopted Apache License 2.0, public contribution guidance, multi-ecosystem Dependabot updates, and the canonical `github.com/codex-remote/admin-platform` module path.
 - Upgraded Vitest to 4.1.11 and js-yaml to a patched release before public source publication.
 - Raised the Go baseline to 1.25 and upgraded `pgx/v5` and `x/crypto` to patched releases before public source publication.
+- Updated `brace-expansion` to patched releases and `golang.org/x/text` to 0.41.0 (with its required `x/sync` 0.22.0 dependency), fixing dependency denial-of-service vulnerabilities including GO-2026-6629.
 
 ## 0.0.1 - 2026-08-13
 
